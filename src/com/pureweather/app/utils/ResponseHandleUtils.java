@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.content.Context;
@@ -91,19 +92,58 @@ public class ResponseHandleUtils {
 		public static void handleWeatherResponse(Context context, String response){
 			try{
 				JSONObject jsonObject = new JSONObject(response);
-				JSONObject weatherInfo = jsonObject.getJSONObject("weatherinfo");
-				String cityName = weatherInfo.getString("city");
-				String weatherCode = weatherInfo.getString("cityid");
-				String temp1 = weatherInfo.getString("temp1");
-				String temp2 = weatherInfo.getString("temp2");
-				String weatherDesp = weatherInfo.getString("weather");
-				String publishTime = weatherInfo.getString("ptime");
-				saveWeatherInfo(context, cityName, weatherCode, temp1, temp2, weatherDesp, publishTime);
+				JSONArray HeWeatherInfo = jsonObject.getJSONArray("HeWeather data service 3.0");
+				// 处理basic字段
+				JSONObject basicInfo = ((JSONObject) HeWeatherInfo.get(0)).getJSONObject("basic");
+				String cityName = basicInfo.getString("city");
+				String cityId = basicInfo.getString("id");
+				JSONObject updateInfo = (JSONObject)basicInfo.getJSONObject("update");
+				String updateTime = updateInfo.getString("loc");
+				//处理aqi字段
+				JSONObject aqiInfo = ((JSONObject) HeWeatherInfo.get(0)).getJSONObject("aqi");
+				JSONObject cityAqiInfo = aqiInfo.getJSONObject("city");
+				String aqiValue = cityAqiInfo.getString("aqi");
+				String pm25Value = cityAqiInfo.getString("pm25");
+				//处理now字段
+				JSONObject nowInfo = ((JSONObject) HeWeatherInfo.get(0)).getJSONObject("now");
+				JSONObject nowCondInfo = nowInfo.getJSONObject("cond");
+				String nowCond = nowCondInfo.getString("txt");
+				String nowTemp =  nowInfo.getString("tmp");
+				//处理daily_forecast字段
+				JSONArray dailyForecastInfo = ((JSONObject)HeWeatherInfo.get(0)).getJSONArray("daily_forecast");
+				JSONObject todayInfo = (JSONObject)dailyForecastInfo.get(0);
+				JSONObject astroInfo = todayInfo.getJSONObject("astro");
+				String sunsetTime = astroInfo.getString("ss");
+				String sunriseTime = astroInfo.getString("sr");
+				String forecastDate = todayInfo.getString("date");
+				String rainyPos = todayInfo.getString("pop");
+				JSONObject tempInfo = todayInfo.getJSONObject("tmp");
+				String maxTemp = tempInfo.getString("max");
+				String minTemp = tempInfo.getString("min");
+				//处理status字段
+				String status = ((JSONObject)HeWeatherInfo.get(0)).getString("status");
 				
+				//SimpleDateFormat sdf = new SimpleDateFormat("yyyy年M月d日",Locale.CHINA);
 				
+				SharedPreferences.Editor editor = PreferenceManager.
+						getDefaultSharedPreferences(context).edit();
 				
-				
-				
+				editor.putBoolean("city_seleted", true);
+				editor.putString("city_name", cityName);
+				editor.putString("city_id", cityId);
+				editor.putString("update_time", updateTime.split(" ")[1]);
+				editor.putString("aqi_value", aqiValue);
+				editor.putString("pm25_value", pm25Value);
+				editor.putString("now_cond", nowCond);
+				editor.putString("now_temp", nowTemp);
+				editor.putString("sunset_time", sunsetTime);
+				editor.putString("sunrise_time", sunriseTime);
+				editor.putString("forecast_date", forecastDate);
+				editor.putString("rainy_pos", rainyPos);
+				editor.putString("max_temp", maxTemp);
+				editor.putString("min_temp", minTemp);
+				editor.putString("status", status);
+				editor.commit();
 				
 			}catch(Exception e){
 				e.printStackTrace();
@@ -111,7 +151,7 @@ public class ResponseHandleUtils {
 		}
 		/*
 		 * 将服务器返回的所有天气数据保存至SharedPrefercens文件中
-		 */
+		 
 		private static void saveWeatherInfo(Context context, String cityName, String weatherCode,
 				String temp1, String temp2, String weatherDesp, String publishTime) {
 			// TODO Auto-generated method stub
@@ -132,7 +172,7 @@ public class ResponseHandleUtils {
 			
 			editor.commit();	
 		}	
-		
+		*/
 		
 	
 }

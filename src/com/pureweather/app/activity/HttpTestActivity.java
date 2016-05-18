@@ -1,5 +1,9 @@
 package com.pureweather.app.activity;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.pureweather.app.R;
 import com.pureweather.app.utils.HttpCallbackListener;
 import com.pureweather.app.utils.HttpUtils;
@@ -24,6 +28,7 @@ public class HttpTestActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		responseText = (TextView) findViewById(R.id.response);
 		responseText.setMovementMethod(new ScrollingMovementMethod());
+		responseText.setTextIsSelectable(true);
 		sendButton = (Button) findViewById(R.id.send);
 		//final String httpUrl = "https://api.heweather.com/x3/citylist?search=allchina&key=37fa5d4ad1ea4d5da9f37e75732fb2e7";
 		final String httpUrl = "https://api.heweather.com/x3/weather?cityid=CN101281801&key=37fa5d4ad1ea4d5da9f37e75732fb2e7";
@@ -42,7 +47,22 @@ public class HttpTestActivity extends Activity {
 							@Override
 							public void run() {
 								// TODO Auto-generated method stub
-								responseText.setText(response);
+								JSONObject JSONObject;
+								try {
+									JSONObject jsonObject = new JSONObject(response);
+									JSONArray HeWeatherInfo = jsonObject.getJSONArray("HeWeather data service 3.0");
+									// ´¦Àíbasic×Ö¶Î
+									JSONObject basicInfo = ((JSONObject) HeWeatherInfo.get(0)).getJSONObject("basic");
+									String cityName = basicInfo.getString("city");
+									String cityId = basicInfo.getString("id");
+									JSONObject updateInfo = (JSONObject)basicInfo.getJSONObject("update");
+									String updateTime = updateInfo.getString("loc");
+									responseText.setText(cityName+cityId+updateTime);
+								} catch (JSONException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+
 							}
 							
 						});
