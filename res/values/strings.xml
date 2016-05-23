@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">PureWeather</string>
+    <string name="app_name">时雨晴</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <color name="green">#99cc33</color>
+    <color name="blue">#6699ff</color>
+    <color name="yellow">#ffcc00</color>
 
 </resources>

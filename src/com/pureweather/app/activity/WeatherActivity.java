@@ -1,105 +1,174 @@
 package com.pureweather.app.activity;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import com.pureweather.app.R;
+import com.pureweather.app.model.PureWeatherDB;
 import com.pureweather.app.utils.HttpCallbackListener;
 import com.pureweather.app.utils.HttpUtils;
 import com.pureweather.app.utils.ResponseHandleUtils;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class WeatherActivity extends Activity implements OnClickListener{
 
-	private TextView weatherTitle;
+	//private TextView weatherTitle;
 	private TextView updateTime;
 	//private TextView aqiValue;
 	private TextView pm25Value;
 	//private TextView nowCond;
-	private TextView nowTemp;
-	private TextView forecastDate;
+	private TextView nowTemp;	
+	private TextView sunTime;
+	private TextView suggestion;
 	private TextView rainyPos;
-	private TextView maxTemp;
+	private TextView tempRange;
+	private TextView humiValue;
+	private Button switchCity;
 	private Button updateInfo;
-	private ImageView condImage;
-	//private TextView minTemp;
+	private Button settingButton;
+	//private ImageView condImage;
+	private PureWeatherDB pureWeatherDB;
+
+	//private ProgressDialog progressDialog;
+	
+
+	//private String cityName = null;
+	private String lastCity = null;
+	
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		setContentView(R.layout.weather_activity);
+		setContentView(R.layout.weather_activity_layout);
 		
-		weatherTitle = (TextView)findViewById(R.id.weather_title);
+		SharedPreferences pref = PreferenceManager.
+				getDefaultSharedPreferences(this);
+		lastCity = pref.getString("last_city", "");	
+		
+		if(TextUtils.isEmpty(lastCity)){
+			//没有lastCity，直接去搜索
+			Intent intent = new Intent(this,SearchCityActivity.class);
+			startActivity(intent);
+			finish();			
+		}
+		
+		//weatherTitle = (TextView)findViewById(R.id.weather_title);
+		
+		suggestion = (TextView)findViewById(R.id.suggestion);
 		updateTime = (TextView)findViewById(R.id.update_time);
 		pm25Value = (TextView)findViewById(R.id.pm25_value);
 		nowTemp = (TextView)findViewById(R.id.now_temp);
-		forecastDate = (TextView)findViewById(R.id.forecast_date);
+		sunTime = (TextView)findViewById(R.id.sun_time);
+		humiValue = (TextView)findViewById(R.id.humidity);
+		//forecastDate = (TextView)findViewById(R.id.forecast_date);
 		rainyPos = (TextView)findViewById(R.id.rainy_pos);
-		maxTemp = (TextView)findViewById(R.id.max_min_temp);
-		updateInfo = (Button)findViewById(R.id.update_weather);
-		condImage = (ImageView)findViewById(R.id.cond_imag);
-		updateInfo.setOnClickListener(this);
-		String countyCode = getIntent().getStringExtra("county_code");
+		tempRange = (TextView)findViewById(R.id.temp_range);
+		switchCity = (Button)findViewById(R.id.weather_activity_switch_city);
+		settingButton = (Button)findViewById(R.id.weather_activity_setting);
+		updateInfo = (Button)findViewById(R.id.weather_title);
+				
+		//condImage = (ImageView)findViewById(R.id.cond_imag);
 		
-		if(!TextUtils.isEmpty(countyCode)){
-			queryWeatherCode(countyCode);
-			//Toast.makeText(WeatherActivity.this, countyCode, Toast.LENGTH_SHORT).show();
+		pureWeatherDB = PureWeatherDB.getInstance(this);
+		
+		updateInfo.setOnClickListener(this);
+		switchCity.setOnClickListener(this);
+		settingButton.setOnClickListener(this);
+		
+		//cityName = getIntent().getStringExtra("city_name");
+
+		//background.setBackgroundColor();
+		//showDialog();
+
+		/*
+		if(!TextUtils.isEmpty(cityName)){
+		//如果从choose界面中传来了一个county_code，说明此时选择了一个新的城市，必须强制用户从网上下载新的数据以供显示
+			//showMyDialog();
+			
+			createDownloadAddress(cityName);
+			Toast.makeText(WeatherActivity.this, cityName, Toast.LENGTH_SHORT).show();
 			//downloadWeatherInfo(countyCode);
 		}
 		else{
+			//显示历史信息即可。
 			showWeather();
-		}		
-				
-	}
+		}*/
 
+
+		showWeather();	
+	}
+	@Override
+	public void onResume(){
+		super.onResume();
+		SharedPreferences pref = PreferenceManager.
+				getDefaultSharedPreferences(this);
+		lastCity = pref.getString("last_city", "");	
+		showWeather();	
+	} 
+
+/*	
 	private void queryWeatherCode(String countyCode) {
 		// TODO Auto-generated method stub
 		String address = new StringBuilder().append("http://www.weather.com.cn/data/list3/city")
 				.append(countyCode).append(".xml").toString();
 		searchInternetForInfo(address, "countyCode");
 	}
-
-	private void searchInternetForInfo(String address,final String type) {
+*/
+	private void searchInternetForInfo(String address) {
 		// TODO Auto-generated method stub
 				
 		HttpUtils.sendHttpRequest(address, new HttpCallbackListener(){
 
 			@Override
-			public void onFinish(String response) {
+			public void onFinish(String response) {//天气提供商有数据回应
 				// TODO Auto-generated method stub
-				if(type.equals("countyCode")){
-					if(!TextUtils.isEmpty(response)){
-						String[] array = response.split("\\|");
-						if(array != null && array.length == 2){
-							createDownloadAddress(array[1]);
-						}
-					}
-				}
-				else if(type.equals("weatherCode")){
-					ResponseHandleUtils.handleWeatherResponse(WeatherActivity.this, response);
-					runOnUiThread(new Runnable(){
 
-						@Override
-						public void run() {
-							// TODO Auto-generated method stub
-							showWeather();
-						}
+					
+					SharedPreferences pref = PreferenceManager.
+							getDefaultSharedPreferences(WeatherActivity.this);	
+					
+					//后期完善存入数据库失败的处理
+					
+					//获取的信息为有效的天气信息，在UI线程更新UI的显示
+					if(pureWeatherDB.saveWeather(response)){
 						
-					});					
-				}
+						//取出response中的 city 字段并保存至pref中的"city_name"
+						ResponseHandleUtils.handleWeatherResponse(WeatherActivity.this, response);
+						
+						lastCity = pref.getString("city_name", "");
+						
+						runOnUiThread(new Runnable(){
+							@Override
+							public void run() {
+								// TODO Auto-generated method stub
+								showWeather();
+								//Toast.makeText(WeatherActivity.this, "已刷新天气信息~", Toast.LENGTH_SHORT).show();
+							}
+						});							
+					}
+					//获取信息失败
+					else{
+						//closeMyDialog();
+						Toast.makeText(WeatherActivity.this, "暂时没有这个城市的天气信息，试试重新加载吧~", Toast.LENGTH_SHORT).show();
+					}
 				
-
 			}
 
 			@Override
@@ -110,7 +179,8 @@ public class WeatherActivity extends Activity implements OnClickListener{
 					@Override
 					public void run() {
 						// TODO Auto-generated method stub
-						Toast.makeText(WeatherActivity.this, "下载天气信息失败", Toast.LENGTH_SHORT).show();
+						//closeMyDialog();
+						Toast.makeText(WeatherActivity.this, "Sorry，网络连接失败，请重试！", Toast.LENGTH_SHORT).show();
 					}
 					
 				});
@@ -121,41 +191,145 @@ public class WeatherActivity extends Activity implements OnClickListener{
 
 	private void showWeather() {
 		// TODO Auto-generated method stub
-		SharedPreferences pref = PreferenceManager.
-				getDefaultSharedPreferences(this);
-		weatherTitle.setText(pref.getString("city_name", ""));
-		updateTime.setText(pref.getString("update_time", ""));
-		pm25Value.setText(pref.getString("pm25_value", ""));
-		nowTemp.setText(pref.getString("now_temp", ""));
-		forecastDate.setText(pref.getString("forecast_date", ""));
-		rainyPos.setText(pref.getString("rainy_pos", ""));
-		maxTemp.setText(pref.getString("max_temp", ""));
-		condImage.setImageResource(R.drawable.clond);
+
+		Cursor cursor = pureWeatherDB.loadWeatherInfo(lastCity);
+		if(cursor.moveToNext()){
+			//Toast.makeText(WeatherActivity.this, cityName, Toast.LENGTH_SHORT).show();
+			updateInfo.setText(cursor.getString(cursor.getColumnIndex("city_name")));
+			suggestion.setText(cursor.getString(cursor.getColumnIndex("suggestion")));
+			
+			String update = new StringBuilder().append("发布时间： ").append(cursor.getString(cursor.getColumnIndex("forecast_date")))
+					.append("， ").append(cursor.getString(cursor.getColumnIndex("update_time"))).toString();				
+			updateTime.setText(update);
+			
+			pm25Value.setText(cursor.getString(cursor.getColumnIndex("pm25_value")));
+			
+			nowTemp.setText(cursor.getString(cursor.getColumnIndex("now_temp"))+" °C");
+			
+			humiValue.setText(cursor.getString(cursor.getColumnIndex("humi_value"))+"%");
+			
+			String sunCond = new StringBuilder().append("日出时间：").append(cursor.getString(cursor.getColumnIndex("sunrise_time")))
+					.append("，日落时间：").append(cursor.getString(cursor.getColumnIndex("sunset_time"))).toString();				
+			sunTime.setText(sunCond);
+			//forecastDate.setText(pref.getString("forecast_date", ""));
+			rainyPos.setText(cursor.getString(cursor.getColumnIndex("rainy_pos"))+"%");
+			
+			String range = new StringBuilder().append(cursor.getString(cursor.getColumnIndex("now_cond"))).append("  ")
+					.append(cursor.getString(cursor.getColumnIndex("max_temp"))).append("°C ~ ")
+					.append(cursor.getString(cursor.getColumnIndex("min_temp"))).append("°C").toString();				
+			tempRange.setText(range);
+			
+		}
+		else{
+			//读取不到数据库的数据，做处理
+		}
+		if(cursor != null){
+			cursor.close();
+		}
 		
+		
+		//closeMyDialog();//加载完成，关闭对话框
+
 	}
 
 	private void createDownloadAddress(String weatherCode) {
 		// TODO Auto-generated method stub
 		String address = new StringBuilder()
-			.append("https://api.heweather.com/x3/weather?cityid=CN").append(weatherCode)
-			.append("&key=37fa5d4ad1ea4d5da9f37e75732fb2e7").toString();	
-		Toast.makeText(WeatherActivity.this, address, Toast.LENGTH_SHORT).show();
-		searchInternetForInfo(address, "weatherCode");
+			.append("http://apis.baidu.com/heweather/pro/weather?city=").append(weatherCode).toString();	
+		
+		searchInternetForInfo(address);
 	}
-
+/*
+	private void showMyDialog(){
+		if(progressDialog == null){
+			progressDialog = new ProgressDialog(this);
+			progressDialog.setMessage("正在加载天气数据...");
+			progressDialog.setCanceledOnTouchOutside(false);
+		}
+		progressDialog.show();
+	}
+	private void closeMyDialog(){
+		if(progressDialog != null){
+			progressDialog.dismiss();
+		}
+	}	
+	*/
 	@Override
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
 		switch(v.getId()){
-		case (R.id.update_weather):
-			Intent intent = new Intent(this,ChooseAreaActivity.class);
-			intent.putExtra("from_weather_activity", true);
+		case (R.id.weather_activity_switch_city):
+			Intent intent = new Intent(this,MainActivity.class);
 			startActivity(intent);
-			finish();			
+			//finish();			
+			break;
+		case (R.id.weather_title):
+			refreshBy2Click();
 			break;
 		default:
 			break;
 		}
 
 	}
+	
+	private static Boolean isRefresh = false;
+	 
+	private void refreshBy2Click() {
+	 Timer tExit = null;
+	 if (isRefresh == false) {
+		 isRefresh = true; // 准备提醒
+		 //Toast.makeText(this, "双击城市名称可以刷新天气哦~", Toast.LENGTH_SHORT).show();
+		 tExit = new Timer();
+		 tExit.schedule(new TimerTask() {
+			 @Override
+			 public void run() {
+				 isRefresh = false; // 取消退出
+			 }
+		 }, 2000); // 如果2秒钟内没有按下键，则启动定时器将标志位复位为false，用户没有选择更新
+	 
+	 }
+	 else{//2秒之内再次点击了刷新按钮，则进行刷新操作		
+			createDownloadAddress(lastCity);
+				//searchInternetForInfo(address,"countyName");
+			Toast.makeText(this, "已刷新天气数据~", Toast.LENGTH_SHORT).show();//后期整改这里，因为这里是未卜先知地提示已刷新成功。后期在下拉刷新中提示
+	 }
+	}
+	
+	/**
+	 * 菜单、返回键响应
+	 */
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+	 // TODO Auto-generated method stub
+		 if(keyCode == KeyEvent.KEYCODE_BACK){ 
+		  exitBy2Click(); //调用双击退出函数
+		}
+		 return false;
+	}
+	/**
+	 * 双击退出函数
+	 */
+	private static Boolean isExit = false;
+	 
+	private void exitBy2Click() {
+		Timer tExit = null;
+		if (isExit == false) {
+			 isExit = true; // 准备退出
+			 Toast.makeText(this, "再按一次返回键将退出程序", Toast.LENGTH_SHORT).show();
+			 tExit = new Timer();
+			 tExit.schedule(new TimerTask() {
+			  @Override
+			  public void run() {
+			  isExit = false; // 取消退出
+			  }
+			 }, 2000); // 如果2秒钟内没有按下返回键，则启动定时器取消掉刚才执行的任务
+			 
+		} 
+		else {
+		 finish();
+		 System.exit(0);
+		}
+	}
+	
+	
 }

@@ -1,9 +1,5 @@
 package com.pureweather.app.utils;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -11,6 +7,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.widget.Toast;
 
 import com.pureweather.app.model.City;
 import com.pureweather.app.model.PureWeatherDB;
@@ -88,91 +85,157 @@ public class ResponseHandleUtils {
 		}
 		/*
 		 * 解析和处理服务器返回的JSON格式的天气数据，并保存到文件中
+		 * 这里只取出城市名称，保存至 pref 
 		 */
-		public static void handleWeatherResponse(Context context, String response){
+		public static boolean handleWeatherResponse(Context context, String response){
+			
+			boolean isLegal = false;
+			SharedPreferences.Editor editor = PreferenceManager.
+					getDefaultSharedPreferences(context).edit();
+			//首先处理返回状态  status 字段
 			try{
 				JSONObject jsonObject = new JSONObject(response);
 				JSONArray HeWeatherInfo = jsonObject.getJSONArray("HeWeather data service 3.0");
-				// 处理basic字段
-				JSONObject basicInfo = ((JSONObject) HeWeatherInfo.get(0)).getJSONObject("basic");
-				String cityName = basicInfo.getString("city");
-				String cityId = basicInfo.getString("id");
-				JSONObject updateInfo = (JSONObject)basicInfo.getJSONObject("update");
-				String updateTime = updateInfo.getString("loc");
-				//处理aqi字段
-				JSONObject aqiInfo = ((JSONObject) HeWeatherInfo.get(0)).getJSONObject("aqi");
-				JSONObject cityAqiInfo = aqiInfo.getJSONObject("city");
-				String aqiValue = cityAqiInfo.getString("aqi");
-				String pm25Value = cityAqiInfo.getString("pm25");
-				//处理now字段
-				JSONObject nowInfo = ((JSONObject) HeWeatherInfo.get(0)).getJSONObject("now");
-				JSONObject nowCondInfo = nowInfo.getJSONObject("cond");
-				String nowCond = nowCondInfo.getString("txt");
-				String nowTemp =  nowInfo.getString("tmp");
-				//处理daily_forecast字段
-				JSONArray dailyForecastInfo = ((JSONObject)HeWeatherInfo.get(0)).getJSONArray("daily_forecast");
-				JSONObject todayInfo = (JSONObject)dailyForecastInfo.get(0);
-				JSONObject astroInfo = todayInfo.getJSONObject("astro");
-				String sunsetTime = astroInfo.getString("ss");
-				String sunriseTime = astroInfo.getString("sr");
-				String forecastDate = todayInfo.getString("date");
-				String rainyPos = todayInfo.getString("pop");
-				JSONObject tempInfo = todayInfo.getJSONObject("tmp");
-				String maxTemp = tempInfo.getString("max");
-				String minTemp = tempInfo.getString("min");
-				//处理status字段
 				String status = ((JSONObject)HeWeatherInfo.get(0)).getString("status");
-				
-				//SimpleDateFormat sdf = new SimpleDateFormat("yyyy年M月d日",Locale.CHINA);
-				
-				SharedPreferences.Editor editor = PreferenceManager.
-						getDefaultSharedPreferences(context).edit();
-				
-				editor.putBoolean("city_seleted", true);
-				editor.putString("city_name", cityName);
-				editor.putString("city_id", cityId);
-				editor.putString("update_time", updateTime.split(" ")[1]);
-				editor.putString("aqi_value", aqiValue);
-				editor.putString("pm25_value", pm25Value);
-				editor.putString("now_cond", nowCond);
-				editor.putString("now_temp", nowTemp);
-				editor.putString("sunset_time", sunsetTime);
-				editor.putString("sunrise_time", sunriseTime);
-				editor.putString("forecast_date", forecastDate);
-				editor.putString("rainy_pos", rainyPos);
-				editor.putString("max_temp", maxTemp);
-				editor.putString("min_temp", minTemp);
-				editor.putString("status", status);
-				editor.commit();
-				
-			}catch(Exception e){
-				e.printStackTrace();
+				isLegal = status.equals("ok");
+
+				//editor.putString("status", status);
+				//seditor.commit();
 			}
+			catch(Exception e){
+				e.printStackTrace();
+				return false;
+			}
+
+			if(isLegal){
+				try{
+					JSONObject jsonObject = new JSONObject(response);
+					JSONArray HeWeatherInfo = jsonObject.getJSONArray("HeWeather data service 3.0");
+					
+					// 处理basic字段
+					JSONObject basicInfo = ((JSONObject) HeWeatherInfo.get(0)).getJSONObject("basic");
+					String cityName = basicInfo.getString("city");
+					
+					editor.putString("city_name", cityName);
+
+					editor.commit();
+					return true;
+				}
+				catch(Exception e){
+					//Toast.makeText(MyApplication.getContext(), "数据解析出错！", Toast.LENGTH_SHORT).show();
+					e.printStackTrace();
+					return false;
+				}				
+			}
+			return false;
 		}
-		/*
-		 * 将服务器返回的所有天气数据保存至SharedPrefercens文件中
-		 
-		private static void saveWeatherInfo(Context context, String cityName, String weatherCode,
-				String temp1, String temp2, String weatherDesp, String publishTime) {
-			// TODO Auto-generated method stub
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy年M月d日",Locale.CHINA);
-			
-			//为何需要一个context对象？命名
+
+		
+/*		
+		public static boolean handleWeatherResponse(Context context, String response){
+			boolean isLegal = false;
 			SharedPreferences.Editor editor = PreferenceManager.
 					getDefaultSharedPreferences(context).edit();
-			
-			editor.putBoolean("city_seleted", true);
-			editor.putString("city_name", cityName);
-			editor.putString("weather_code", weatherCode);
-			editor.putString("temp1", temp1);
-			editor.putString("temp2", temp2);
-			editor.putString("weather_desp", weatherDesp);
-			editor.putString("publish_time", publishTime);
-			editor.putString("current_date", sdf.format(new Date()));
-			
-			editor.commit();	
-		}	
-		*/
+			//首先处理返回状态  status 字段
+			try{
+				JSONObject jsonObject = new JSONObject(response);
+				JSONArray HeWeatherInfo = jsonObject.getJSONArray("HeWeather data service 3.0");
+				String status = ((JSONObject)HeWeatherInfo.get(0)).getString("status");
+				isLegal = status.equals("ok");
+
+				editor.putString("status", status);
+				editor.commit();
+			}
+			catch(Exception e){
+				e.printStackTrace();
+				return false;
+			}
+
+			if(isLegal){
+				try{
+					JSONObject jsonObject = new JSONObject(response);
+					JSONArray HeWeatherInfo = jsonObject.getJSONArray("HeWeather data service 3.0");
+					//处理aqi字段，因为部分城市没有这个数值，直接解析会导致出错，故需要分开解析
+					String aqiValue;
+					String pm25Value;
+					try{
+					
+					JSONObject aqiInfo = ((JSONObject) HeWeatherInfo.get(0)).getJSONObject("aqi");
+					JSONObject cityAqiInfo = aqiInfo.getJSONObject("city");
+					 aqiValue = cityAqiInfo.getString("aqi");
+					 pm25Value = cityAqiInfo.getString("pm25");	
+					}
+					catch(Exception e){
+						e.printStackTrace();
+						 aqiValue = "无相关信息";
+						 pm25Value = "无相关信息";	
+					}
+					
+					// 处理basic字段
+					JSONObject basicInfo = ((JSONObject) HeWeatherInfo.get(0)).getJSONObject("basic");
+					String cityName = basicInfo.getString("city");
+					String cityId = basicInfo.getString("id");
+					JSONObject updateInfo = (JSONObject)basicInfo.getJSONObject("update");
+					String updateTime = updateInfo.getString("loc");
+					
+
+					//处理now字段
+					JSONObject nowInfo = ((JSONObject) HeWeatherInfo.get(0)).getJSONObject("now");
+					JSONObject nowCondInfo = nowInfo.getJSONObject("cond");
+					String nowCond = nowCondInfo.getString("txt");
+					String nowCode = nowCondInfo.getString("code");
+					String nowTemp =  nowInfo.getString("tmp");
+					String humiValue = nowInfo.getString("hum");
+					
+					//处理daily_forecast字段
+					JSONArray dailyForecastInfo = ((JSONObject)HeWeatherInfo.get(0)).getJSONArray("daily_forecast");
+					JSONObject todayInfo = (JSONObject)dailyForecastInfo.get(0);
+					JSONObject astroInfo = todayInfo.getJSONObject("astro");
+					String sunsetTime = astroInfo.getString("ss");
+					String sunriseTime = astroInfo.getString("sr");
+					String forecastDate = todayInfo.getString("date");
+					String rainyPos = todayInfo.getString("pop");
+					JSONObject tempInfo = todayInfo.getJSONObject("tmp");
+					String maxTemp = tempInfo.getString("max");
+					String minTemp = tempInfo.getString("min");
+
+					//处理suggestion字段
+					JSONObject suggestionInfo = ((JSONObject)HeWeatherInfo.get(0)).getJSONObject("suggestion");
+					JSONObject comfInfo = suggestionInfo.getJSONObject("comf");
+					String suggestion = new StringBuilder().append("         ")
+							.append(comfInfo.getString("brf")).append("。").append(comfInfo.getString("txt")).toString();
+					//SimpleDateFormat sdf = new SimpleDateFormat("yyyy年M月d日",Locale.CHINA);
+					//
+					
+					editor.putBoolean("city_seleted", true);
+					editor.putString("city_name", cityName);
+					editor.putString("city_id", cityId);
+					editor.putString("update_time", updateTime.split(" ")[1]);
+					editor.putString("aqi_value", aqiValue);
+					editor.putString("pm25_value", pm25Value);
+					editor.putString("now_cond", nowCond);
+					editor.putString("now_temp", nowTemp);
+					editor.putString("sunset_time", sunsetTime);
+					editor.putString("sunrise_time", sunriseTime);
+					editor.putString("forecast_date", forecastDate);
+					editor.putString("rainy_pos", rainyPos);
+					editor.putString("max_temp", maxTemp);
+					editor.putString("min_temp", minTemp);
+					editor.putString("image_code", nowCode);
+					editor.putString("suggestion", suggestion);
+					editor.putString("humi_value", humiValue);
+					editor.commit();
+					return true;
+				}
+				catch(Exception e){
+					//Toast.makeText(MyApplication.getContext(), "数据解析出错！", Toast.LENGTH_SHORT).show();
+					e.printStackTrace();
+					return false;
+				}				
+			}
+			return false;
+		}
+*/
 		
 	
 }

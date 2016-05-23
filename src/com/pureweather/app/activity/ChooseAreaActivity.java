@@ -24,24 +24,27 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class ChooseAreaActivity extends Activity {
+public class ChooseAreaActivity extends Activity implements OnClickListener{
 	
 	public static final int PROVINCE = 0;
 	public static final int CITY = 1;
 	public static final int COUNTY = 2;
 	
-	private boolean isFromWeatherActivity;
 	private ProgressDialog progressDialog;
 	private TextView titleText;
 	private ListView listView;
+	private Button backButton;
+	
 	private ArrayAdapter<String> adapter;
 	private PureWeatherDB pureWeatherDB;
 	/*
@@ -56,7 +59,7 @@ public class ChooseAreaActivity extends Activity {
 	 */
 	private Province seletedProvince;
 	private City seletedCity;
-	
+	private String lastCity;
 	private int currentLevel = PROVINCE;	
 	
 	
@@ -66,21 +69,20 @@ public class ChooseAreaActivity extends Activity {
 		
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.choose_area_activity);
-		isFromWeatherActivity = getIntent().getBooleanExtra("from_weather_activity", false);
 		
-		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(ChooseAreaActivity.this);
-		if((pref.getBoolean("city_seleted", false)) && !isFromWeatherActivity){
-			Intent intent = new Intent(this,WeatherActivity.class);
-			startActivity(intent);
-			finish();
-			return ;
-		}
+		seletedProvince = null;
+		seletedCity = null;
 		
+		backButton = (Button)findViewById(R.id.choose_activity_back);
+		backButton.setOnClickListener(this);
 		listView = (ListView)findViewById(R.id.list_view);
-		titleText = (TextView)findViewById(R.id.title_text);
-		adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, dataList);
+		adapter = new ArrayAdapter<String>(this, R.layout.choose_listview_item, dataList);
+
 		listView.setAdapter(adapter);
+
 		pureWeatherDB = PureWeatherDB.getInstance(this);
+		
+		titleText = (TextView)findViewById(R.id.choose_activity_title);
 		
 		queryProvinces();
 		
@@ -99,13 +101,18 @@ public class ChooseAreaActivity extends Activity {
 				}
 				
 				else if(currentLevel == COUNTY){
-					Intent intent = new Intent(ChooseAreaActivity.this,WeatherActivity.class);
-					String countyCode = countyList.get(index).getCountyCode();
-					intent.putExtra("county_code", countyCode);
+										
+					lastCity = dataList.get(index);
+
 					
-					//Toast.makeText(ChooseAreaActivity.this, countyCode, Toast.LENGTH_SHORT).show();
+					queryFromServer(lastCity, "last_city");
+					//closeProgressDialog();
+					//intent.putExtra("city_name", dataList.get(index));
+					/*
+					Intent intent = new Intent(ChooseAreaActivity.this,WeatherActivity.class);
 					startActivity(intent);
 					finish();
+					*/
 				}
 				
 			}
@@ -121,8 +128,8 @@ public class ChooseAreaActivity extends Activity {
 				dataList.add(p.getProvinceName());
 			}
 			adapter.notifyDataSetChanged();
-			listView.setSelection(0);
-			titleText.setText("中国");
+			StringBuilder title = new StringBuilder().append("已选择： ").append("中国");
+			titleText.setText(title.toString());
 			currentLevel = PROVINCE;
 		}//end if
 		else{
@@ -139,8 +146,9 @@ public class ChooseAreaActivity extends Activity {
 				dataList.add(c.getCityName());
 			}
 			adapter.notifyDataSetChanged();
-			listView.setSelection(0);			
-			titleText.setText(seletedProvince.getProvinceName());
+			listView.setSelection(0);
+			StringBuilder title = new StringBuilder().append("已选择： ").append("中国 - ").append(seletedProvince.getProvinceName());
+			titleText.setText(title.toString());
 			currentLevel = CITY;			
 		}
 		else{
@@ -157,8 +165,10 @@ public class ChooseAreaActivity extends Activity {
 				dataList.add(c.getCountyName());
 			}
 			adapter.notifyDataSetChanged();
-			listView.setSelection(0);			
-			titleText.setText(seletedCity.getCityName());
+			listView.setSelection(0);
+			StringBuilder title = new StringBuilder().append("已选择： ").append("中国 - ").append(seletedProvince.getProvinceName())
+					.append(" - ").append(seletedCity.getCityName());			
+			titleText.setText(title.toString());
 			currentLevel = COUNTY;			
 		}
 		else{
@@ -170,14 +180,19 @@ public class ChooseAreaActivity extends Activity {
  */
 	private void queryFromServer(final String code, final String type) {
 		// TODO Auto-generated method stub
-		String address;
-		if (!TextUtils.isEmpty(code)){
+		String address = "";
+		if (type.equals("city") || type.equals("county")){
 			address = new StringBuilder().append("http://www.weather.com.cn/data/list3/city").
 					append(code).append(".xml").toString();
 		}
-		else{
+		else if(type.equals("province")){
 			address = new StringBuilder().append("http://www.weather.com.cn/data/list3/city.xml").toString();
 		}
+		else{
+			address = new StringBuilder().append("http://apis.baidu.com/heweather/pro/weather?city=")
+					.append(code).toString();
+		}
+		
 		showProgressDialog();
 		HttpUtils.sendHttpRequest(address, new HttpCallbackListener(){
 
@@ -194,6 +209,11 @@ public class ChooseAreaActivity extends Activity {
 				else if(type.equals("county")){
 					result = ResponseHandleUtils.handleCountiesResponse(pureWeatherDB, response, seletedCity.getId());				
 				}
+				else if(type.equals("last_city")){
+					result = pureWeatherDB.saveWeather(response);
+				}
+				
+				
 				//以上已经下载完毕，以下重新调用查询数据库的方法
 				if(result){
 					//queryProvince一类的方法中涉及到UI操作，而onFinish方法是在子线程中执行的。
@@ -211,6 +231,15 @@ public class ChooseAreaActivity extends Activity {
 							}
 							else if(type.equals("county")){
 								queryCounties();
+							}
+							else{
+								SharedPreferences.Editor editor = PreferenceManager.
+										getDefaultSharedPreferences(ChooseAreaActivity.this).edit();
+								editor.putString("last_city", code);
+								editor.commit();
+								Intent intent = new Intent(ChooseAreaActivity.this,WeatherActivity.class);
+								startActivity(intent);
+								finish();
 							}
 							closeProgressDialog();//下载完成，关闭提示框
 						}//end run
@@ -230,7 +259,7 @@ public class ChooseAreaActivity extends Activity {
 						// TODO Auto-generated method stub
 						closeProgressDialog();
 						Toast.makeText(ChooseAreaActivity.this,
-								"加载网络数据失败!", Toast.LENGTH_SHORT).show();
+								"加载网络数据失败!请重试...", Toast.LENGTH_SHORT).show();
 					}//end run
 				});//end runOnUiThread
 			}//end onError
@@ -267,18 +296,28 @@ public class ChooseAreaActivity extends Activity {
 	public void onBackPressed(){
 		if(currentLevel == COUNTY){
 			queryCities();
+			listView.setSelection(dataList.indexOf(seletedCity.getCityName()));
 		}
 		else if(currentLevel == CITY){
-			queryProvinces();
+			queryProvinces();			
+			listView.setSelection(dataList.indexOf(seletedProvince.getProvinceName()));
 		}
 		else if(currentLevel == PROVINCE){
-			
-			if(isFromWeatherActivity){
-				Intent intent = new Intent(this,WeatherActivity.class);
-				startActivity(intent);
-			}
-			
+			Intent intent = new Intent(this,SearchCityActivity.class);
+			startActivity(intent);
 			finish();		
+		}
+	}
+
+	@Override
+	public void onClick(View v) {
+		// TODO Auto-generated method stub
+		switch(v.getId()){
+			case (R.id.choose_activity_back):
+				Intent intent = new Intent(this,SearchCityActivity.class);
+				startActivity(intent);
+				finish();					
+				break;
 		}
 	}	
 }

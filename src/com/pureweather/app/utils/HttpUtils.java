@@ -21,11 +21,12 @@ public class HttpUtils {
 					URL url = new URL(address);
 					connection = (HttpURLConnection) url.openConnection();
 					connection.setRequestMethod("GET");
-					connection.setConnectTimeout(8000);
-					connection.setReadTimeout(8000);
+					connection.setConnectTimeout(5000);
+					connection.setReadTimeout(5000);
+					connection.setRequestProperty("apikey",  "3cc16767d699197caf22d11f13c5729b");
 					//connection.connect();
 					InputStream in = connection.getInputStream();
-					BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+					BufferedReader reader = new BufferedReader(new InputStreamReader(in,"UTF-8"));
 					StringBuilder response = new StringBuilder();
 					String line;
 					while((line = reader.readLine()) != null){

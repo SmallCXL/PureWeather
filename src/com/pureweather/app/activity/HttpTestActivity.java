@@ -31,7 +31,8 @@ public class HttpTestActivity extends Activity {
 		responseText.setTextIsSelectable(true);
 		sendButton = (Button) findViewById(R.id.send);
 		//final String httpUrl = "https://api.heweather.com/x3/citylist?search=allchina&key=37fa5d4ad1ea4d5da9f37e75732fb2e7";
-		final String httpUrl = "https://api.heweather.com/x3/weather?cityid=CN101281801&key=37fa5d4ad1ea4d5da9f37e75732fb2e7";
+		
+		final String httpUrl = "http://apis.baidu.com/heweather/pro/weather?city=”Ò¡÷";
 		sendButton.setOnClickListener(new OnClickListener(){
 		
 		
@@ -49,7 +50,8 @@ public class HttpTestActivity extends Activity {
 								// TODO Auto-generated method stub
 								JSONObject JSONObject;
 								try {
-									JSONObject jsonObject = new JSONObject(response);
+									//JSONObject jsonObject = new JSONObject(response);
+									/*
 									JSONArray HeWeatherInfo = jsonObject.getJSONArray("HeWeather data service 3.0");
 									// ¥¶¿Ìbasic◊÷∂Œ
 									JSONObject basicInfo = ((JSONObject) HeWeatherInfo.get(0)).getJSONObject("basic");
@@ -58,7 +60,9 @@ public class HttpTestActivity extends Activity {
 									JSONObject updateInfo = (JSONObject)basicInfo.getJSONObject("update");
 									String updateTime = updateInfo.getString("loc");
 									responseText.setText(cityName+cityId+updateTime);
-								} catch (JSONException e) {
+									*/
+									responseText.setText(response);
+								} catch (Exception e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}

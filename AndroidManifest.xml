@@ -16,19 +16,33 @@
         <activity
             android:name="com.pureweather.app.activity.HttpTestActivity"
             android:label="@string/app_name" >
-
+     
         </activity>
         <activity
             android:name="com.pureweather.app.activity.ChooseAreaActivity">
-            <intent-filter>
+
+        </activity>
+        <activity
+            android:name="com.pureweather.app.activity.WeatherActivity"
+            android:launchMode="singleTask">
+             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+             </intent-filter>              
         </activity>
         <activity
-            android:name="com.pureweather.app.activity.WeatherActivity">
+            android:name="com.pureweather.app.activity.MainActivity"    
+            android:launchMode="singleTask">
+ 
         </activity>
+ 
+        <activity
+            android:name="com.pureweather.app.activity.SearchCityActivity"
+            android:windowSoftInputMode="adjustPan|stateHidden"
+            android:launchMode="singleTask">
+             
+        </activity>        
     </application>
 
 </manifest>
