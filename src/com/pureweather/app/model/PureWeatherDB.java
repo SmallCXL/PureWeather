@@ -193,8 +193,8 @@ public class PureWeatherDB {
 				}
 				catch(Exception e){
 					e.printStackTrace();
-					 aqiValue = "无相关信息";
-					 pm25Value = "无相关信息";	
+					 aqiValue = "无信息";
+					 pm25Value = "无信息";	
 				}
 				
 				// 处理basic字段
@@ -300,45 +300,17 @@ public class PureWeatherDB {
 		return infoList;
 	}
 
-/*
-	public boolean loadWeatherInfoToPref(String cityName){
-		Cursor cursor = null;
-		cursor = db.query("Weather", null, "city_name = ?", new String[]{cityName}, null, null, null);
-		SharedPreferences.Editor editor = PreferenceManager.
-				getDefaultSharedPreferences(mContext).edit();
-		if(cursor.moveToNext()){
-			editor.putBoolean("city_seleted", true);
-			editor.putString("city_name", cityName);
-			editor.putString("city_id", cursor.getString(cursor.getColumnIndex("city_id")));
-			editor.putString("update_time", cursor.getString(cursor.getColumnIndex("update_time")));
-			editor.putString("aqi_value", cursor.getString(cursor.getColumnIndex("aqi_value")));
-			editor.putString("pm25_value", cursor.getString(cursor.getColumnIndex("pm25_value")));
-			editor.putString("now_cond", cursor.getString(cursor.getColumnIndex("now_cond")));
-			editor.putString("now_temp", cursor.getString(cursor.getColumnIndex("now_temp")));
-			editor.putString("sunset_time", cursor.getString(cursor.getColumnIndex("sunset_time")));
-			editor.putString("sunrise_time", cursor.getString(cursor.getColumnIndex("sunrise_time")));
-			editor.putString("forecast_date", cursor.getString(cursor.getColumnIndex("forecast_date")));
-			editor.putString("rainy_pos",cursor.getString(cursor.getColumnIndex("rainy_pos")));
-			editor.putString("max_temp", cursor.getString(cursor.getColumnIndex("max_temp")));
-			editor.putString("min_temp", cursor.getString(cursor.getColumnIndex("min_temp")));
-			editor.putString("status", cursor.getString(cursor.getColumnIndex("status")));
-			editor.putString("image_code", cursor.getString(cursor.getColumnIndex("image_code")));
-			editor.putString("suggestion", cursor.getString(cursor.getColumnIndex("suggestion")));
-			editor.putString("humi_value", cursor.getString(cursor.getColumnIndex("humi_value")));
-			
-			editor.commit();
-			cursor.close();
-			return true;
-		}
-		return false;
-		
-	} 
-*/
 	public Cursor loadWeatherInfo(String cityName){
 		Cursor cursor = null;
 		cursor = db.query("Weather", null, "city_name = ?", new String[]{cityName}, null, null, null);
 		return cursor;
 		
 	}
+	
+	public int deleteWeatherInfo(String cityName){
+		
+		return db.delete("Weather", "city_name = ?", new String[]{cityName});
+		
+	}	
 	
 }

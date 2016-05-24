@@ -7,15 +7,15 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:background="#3f51b5"
+        android:background="#7cb342"
         android:orientation="horizontal" >
         <Button
             android:id="@+id/search_activity_back"
             android:layout_width="30dp"
-            android:layout_height="35dp"
+            android:layout_height="30dp"
             android:layout_gravity="center"
             android:layout_marginLeft="15dp"
-            android:background="@drawable/back_button"
+            android:background="@drawable/search_back"
             android:textColor="#ffffff"
             android:textSize="18sp" />
 	    <TextView
@@ -25,16 +25,16 @@
 	        android:text="搜索城市"
 	        android:gravity="center"
 	        android:layout_gravity="center"
-	        android:background="#3f51b5"
+	        android:background="#00000000"
 	        android:textColor="#ffffff"
 	        android:textSize="20sp"/>
 		<Button
 	        android:id="@+id/search_from_list"
 	        android:layout_marginRight="15dp"
 	        android:layout_width="30dp"
-	        android:layout_height="35dp"
+	        android:layout_height="30dp"
 	        android:layout_gravity="center"
-	        android:background="@drawable/menu_button"
+	        android:background="@drawable/search_menu"
 	        />
 	</LinearLayout>
 
@@ -72,16 +72,17 @@
 		    android:layout_weight="1"
 		    android:layout_height="match_parent"
 		    android:layout_width="0dp"/>
+
 	    <Button
 	        android:id="@+id/search_city"
-	        android:layout_width="50dp"
+	        android:layout_width="wrap_content"
 	        android:layout_height="32dp"
-			android:layout_gravity="center"
-			android:layout_marginRight="15dp"
-			android:text="搜索"
-			android:textColor="#ffffff"
-	        android:textSize="15sp"
-	        android:background="@drawable/button_border_search"/>
+	        android:layout_gravity="center"
+	        android:layout_marginRight="15dp"
+	        android:background="@drawable/button_seleter"
+	        android:text="搜索"
+	        android:textColor="#ffffff"
+	        android:textSize="15sp" />
 	    
 	</LinearLayout>
 	<View
@@ -89,7 +90,7 @@
 	    android:layout_height="0.7dp"
 
 
-	    android:background="#3f51b5"/>
+	    android:background="#757575"/>
 	
     <LinearLayout
 	    android:layout_width="match_parent"
@@ -106,23 +107,17 @@
 		    android:textColor="#424242"
 		    android:textSize="15sp"
 		    android:text="搜索结果："/>
-		<View
-		    android:layout_width="match_parent"
-		    android:layout_height="0.7dp"
-		    android:layout_marginLeft="10dp"
-		    android:layout_marginRight="10dp"
-	
-		    android:background="#3f51b5"/>		
+				
 	</LinearLayout>
 
 	<ListView
 	        android:id="@+id/search_result"
-			android:layout_marginLeft="10dp"
-			android:layout_marginRight="10dp"
+			android:layout_marginLeft="15dp"
+			android:layout_marginRight="15dp"
 	        android:layout_weight="1"
 	        android:layout_width="match_parent"
 	        android:layout_height="0dp"
-	        android:divider="#3f51b5"
+	        android:divider="#bdbdbd"
 	        android:dividerHeight="0.7dp"
 	        />
 

@@ -8,7 +8,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:background="#3f51b5"
+        android:background="#607d8b"
         android:orientation="horizontal" >
         <Button
             android:id="@+id/main_activity_back"
@@ -16,7 +16,7 @@
             android:layout_height="30dp"
             android:layout_gravity="center"
             android:layout_marginLeft="15dp"
-            android:background="@drawable/back_button"
+            android:background="@drawable/main_back"
             android:textColor="#ffffff"
             android:textSize="18sp" />
         <TextView
@@ -31,22 +31,22 @@
 
         <Button
             android:id="@+id/add_city"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_gravity="center"
             android:layout_marginRight="15dp"
-            android:background="@drawable/search_activity_search"
+            android:background="@drawable/main_add"
             android:textColor="#ffffff"
             android:textSize="18sp" />
     </LinearLayout>
 
     <ListView
         android:id="@+id/main_city_listview"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
         android:layout_height="0dp"
         android:layout_weight="1"
-		android:divider="#3f51b5"
+		android:divider="#bdbdbd"
 		android:dividerHeight="0.7dp"
         android:layout_width="match_parent"/>
 

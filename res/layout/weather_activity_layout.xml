@@ -17,7 +17,7 @@
 	            android:layout_height="30dp"
 	            android:layout_gravity="center"
 	            android:layout_marginLeft="15dp"
-	            android:background="@drawable/setting_button"
+	            android:background="@drawable/menu_button"
 	            android:textColor="#ffffff"
 	            android:textSize="18sp" />
 
@@ -36,10 +36,10 @@
 	        <Button
 	            android:id="@+id/weather_activity_switch_city"
 	            android:layout_width="30dp"
-	            android:layout_height="35dp"
+	            android:layout_height="30dp"
 	            android:layout_gravity="center"
 	            android:layout_marginRight="15dp"
-	            android:background="@drawable/menu_button" />
+	            android:background="@drawable/search_button" />
 	    </LinearLayout>
 
 	    <ScrollView
@@ -64,52 +64,86 @@
 		    <LinearLayout
 		        android:layout_width="match_parent"
 		        android:layout_height="150dp"
-		        android:layout_marginLeft="5dp"
-		        android:layout_marginRight="5dp"
-		        android:layout_marginTop="5dp"
+
 		        android:layout_weight="1.20"
-		        android:orientation="vertical" >
-	
+		        android:orientation="horizontal" >
+
+				<View
+				    android:layout_width="0dp"
+				    android:layout_height="match_parent"
+				    android:layout_weight="0.48" />
+
 		        <TextView
 		            android:id="@+id/now_temp"
-		            android:layout_width="match_parent"
-		            android:layout_height="0dp"
-		            android:layout_weight="1"
-		            
+		            android:layout_width="0dp"
+		            android:layout_height="match_parent"
+		            android:layout_weight="3.53"
 		            android:gravity="center"
-		            android:text="N/A°C"
-		            android:textColor="#3f51b5"
+		            android:text="30°C"
+		            android:textColor="#3949ab"
 		            android:textSize="70sp" />
-	
+
+				<View
+				    android:layout_width="0dp"
+				    android:layout_height="match_parent"
+				    android:layout_weight="0.35" />
+
 		        <LinearLayout
-		            android:layout_width="match_parent"
-		            android:layout_height="40dp"
-		            android:orientation="horizontal" >
-	
-		            <TextView
-		                android:id="@+id/sun_time"
-		                android:layout_width="0dp"
-		                android:layout_height="match_parent"
-		                android:layout_weight="2"
-		                android:layout_marginLeft="5dp"
-		                android:gravity="center|left"
-		                android:text="N/A"
-		                android:textColor="#424242"
-		                android:textSize="13sp" />
-	
-		            
-	
-		            <TextView
-		                android:id="@+id/temp_range"
-		                android:layout_width="0dp"
-		                android:layout_height="match_parent"
-		                android:layout_marginLeft="10dp"
-		                android:layout_weight="1"
-		                android:gravity="center|left"
-		                android:text="N/A°C~N/A°C"
-		                android:textColor="#424242"
-		                android:textSize="13sp" />
+		            android:layout_width="0dp"
+		            android:layout_height="match_parent"
+		            android:layout_weight="3.04"
+		            android:layout_marginRight="15dp"
+		            android:orientation="vertical" >
+
+					<View
+					    android:layout_width="match_parent"
+					    android:layout_height="0dp"
+					    android:layout_weight="0.18" />	
+				    <LinearLayout
+				        android:layout_width="match_parent"
+				        android:layout_height="25dp"
+				        android:orientation="horizontal" >				    		            
+						
+						<TextView
+						    android:id="@+id/now_cond"
+					        android:layout_width="0dp"
+					        android:layout_height="25dp"
+					        android:layout_weight="1.3"
+					        android:gravity="center"
+					        android:text="N/A"
+					        android:textColor="#424242"
+					        android:textSize="13sp" />	
+					</LinearLayout>        				            
+
+			    	<View
+			    	    android:layout_width="match_parent"
+			    	    android:layout_height="1dp"
+			    	    android:layout_gravity="center"
+			    	    android:background="#259b24" />
+				          
+				    <LinearLayout
+				        android:layout_width="match_parent"
+				        android:layout_height="25dp"
+				        android:orientation="horizontal" >				    		            
+						<TextView
+						    android:id="@+id/temp_range"
+					        android:layout_width="0dp"
+					        android:layout_height="25dp"
+					        android:layout_weight="1.3"
+					        android:gravity="center"
+					        android:text="N/A"
+					        android:textColor="#424242"
+					        android:textSize="13sp" />	
+					</LinearLayout>  
+					 
+					<View
+					    android:layout_width="match_parent"
+					    android:layout_height="0dp"
+					    android:layout_weight="0.27" />		            
 		        </LinearLayout>
+
+					
+		        
 		    </LinearLayout>
 	
 		    <View
@@ -132,37 +166,45 @@
 		        android:layout_weight="1.20"
 		        android:layout_marginTop="5dp"
 		        android:orientation="horizontal" >
+
 		  		<View
-		        android:layout_width="0dp"
-		        android:layout_height="match_parent"
-		        android:layout_weight="1"/>
+		  		    android:layout_width="0dp"
+		  		    android:layout_height="match_parent"
+		  		    android:layout_weight="0.48" />
+
 				<ImageView
-				    android:layout_width="150dp"
+				    android:layout_width="0dp"
 				    android:layout_height="match_parent"
-				    android:src="@drawable/ic_launcher"/>
+				    android:layout_weight="3.53"
+				    android:src="@drawable/ic_launcher" />
+
 		  		<View
-			        android:layout_width="0dp"
-			        android:layout_height="match_parent"
-			        android:layout_weight="1"/>				
+		  		    android:layout_width="0dp"
+		  		    android:layout_height="match_parent"
+		  		    android:layout_weight="0.35" />
+
 				<LinearLayout
-		            android:layout_width="170dp"
-		            android:layout_height="match_parent"
-		            android:layout_marginTop="5dp"
-		            android:orientation="vertical" >
+				    android:layout_width="0dp"
+				    android:layout_height="match_parent"
+				    android:layout_marginRight="15dp"
+				    android:layout_weight="3.04"
+				    android:orientation="vertical" >
+s
 					<View
-					    android:layout_weight="1"
+					    android:layout_width="match_parent"
 					    android:layout_height="0dp"
-					    android:layout_width="match_parent"/>
+					    
+					    android:layout_weight="0.18" />
+
 				    <LinearLayout
 				        android:layout_width="match_parent"
 				        android:layout_height="25dp"
-				        android:layout_marginTop="5dp"
 				        android:orientation="horizontal" >				    		            
 						<TextView
 					        android:layout_width="0dp"
 					        android:layout_height="25dp"
 					        android:layout_weight="1"
-					        android:layout_marginLeft="10dp"
+					        android:layout_marginLeft="5dp"
 					        android:gravity="center|left"
 					        android:text="降水概率："
 					        android:textColor="#424242"
@@ -171,58 +213,26 @@
 						    android:id="@+id/rainy_pos"
 					        android:layout_width="0dp"
 					        android:layout_height="25dp"
-					        android:layout_weight="1.3"
-					        android:gravity="center|left"
+					        android:layout_weight="1"
+					        android:layout_marginRight="5dp"
+					        android:gravity="center"
 					        android:text="N/A%"
 					        android:textColor="#424242"
 					        android:textSize="13sp" />	
 					</LinearLayout>        				            
 			    	<View
 				        android:layout_width="match_parent"
-				        android:layout_marginLeft="10dp"
-				        android:layout_marginRight="10dp"
 				        android:layout_height="1dp"
-				        android:background="#3f51b5" />				          
+				        android:background="#259b24" />				          
 				    <LinearLayout
 				        android:layout_width="match_parent"
 				        android:layout_height="25dp"
-				        android:layout_marginTop="5dp"
 				        android:orientation="horizontal" >				    		            
 						<TextView
 					        android:layout_width="0dp"
 					        android:layout_height="25dp"
 					        android:layout_weight="1"
-					        android:layout_marginLeft="10dp"
-					        android:gravity="center|left"
-					        android:text="PM2.5："
-					        android:textColor="#424242"
-					        android:textSize="13sp" />	
-						<TextView
-						    android:id="@+id/pm25_value"
-					        android:layout_width="0dp"
-					        android:layout_height="25dp"
-					        android:layout_weight="1.3"
-					        android:gravity="center|left"
-					        android:text="N/A"
-					        android:textColor="#424242"
-					        android:textSize="13sp" />	
-					</LinearLayout>  
-			    	<View
-				        android:layout_width="match_parent"
-				        android:layout_marginLeft="10dp"
-				        android:layout_marginRight="10dp"
-				        android:layout_height="1dp"
-				        android:background="#3f51b5" />					
-				    <LinearLayout
-				        android:layout_width="match_parent"
-				        android:layout_height="25dp"
-				        android:layout_marginTop="5dp"
-				        android:orientation="horizontal" >				    		            
-						<TextView
-					        android:layout_width="0dp"
-					        android:layout_height="25dp"
-					        android:layout_weight="1"
-					        android:layout_marginLeft="10dp"
+					        android:layout_marginLeft="5dp"
 					        android:gravity="center|left"
 					        android:text="相对湿度："
 					        android:textColor="#424242"
@@ -231,21 +241,51 @@
 						    android:id="@+id/humidity"
 					        android:layout_width="0dp"
 					        android:layout_height="25dp"
-					        android:layout_weight="1.3"
-					        android:gravity="center|left"
+					        android:layout_weight="1"
+					        android:layout_marginRight="5dp"
+					        android:gravity="center"
 					        android:text="N/A%"
 					        android:textColor="#424242"
 					        android:textSize="13sp" />	
+					</LinearLayout>  
+			    	<View
+				        android:layout_width="match_parent"
+				        android:layout_height="1dp"
+				        android:background="#259b24" />					
+				    <LinearLayout
+				        android:layout_width="match_parent"
+				        android:layout_height="25dp"
+				        android:orientation="horizontal" >				    		            
+						<TextView
+					        android:layout_width="0dp"
+					        android:layout_height="25dp"
+					        android:layout_weight="1"
+					        android:layout_marginLeft="5dp"
+					        android:gravity="center|left"
+					        android:text="PM2.5："
+					        android:textColor="#424242"
+					        android:textSize="13sp" />	
+						<TextView
+						    android:id="@+id/pm25_value"
+					        android:layout_width="0dp"
+					        android:layout_height="25dp"
+					        android:layout_weight="1"
+					        android:layout_marginRight="5dp"
+					        android:gravity="center"
+					        android:text="N/A"
+					        android:textColor="#424242"
+					        android:textSize="13sp" />	
 					</LinearLayout>   					 
+
 					<View
-					    android:layout_weight="1"
+					    android:layout_width="match_parent"
 					    android:layout_height="0dp"
-					    android:layout_width="match_parent"/>			              
+					    android:layout_weight="0.27" />
+			              
 		 		</LinearLayout>
-		 		<View
-		 		    android:layout_weight="1"
-		 		    android:layout_width="0dp"
-		 		    android:layout_height="match_parent"/>
+
+		 		
+
 			</LinearLayout>
 		    <View
 		        android:layout_width="match_parent"

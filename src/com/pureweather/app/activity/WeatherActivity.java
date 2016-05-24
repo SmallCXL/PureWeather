@@ -5,6 +5,7 @@ import java.util.TimerTask;
 
 import com.pureweather.app.R;
 import com.pureweather.app.model.PureWeatherDB;
+import com.pureweather.app.service.AutoUpdateService;
 import com.pureweather.app.utils.HttpCallbackListener;
 import com.pureweather.app.utils.HttpUtils;
 import com.pureweather.app.utils.ResponseHandleUtils;
@@ -34,7 +35,7 @@ public class WeatherActivity extends Activity implements OnClickListener{
 	private TextView pm25Value;
 	//private TextView nowCond;
 	private TextView nowTemp;	
-	private TextView sunTime;
+	private TextView nowCond;
 	private TextView suggestion;
 	private TextView rainyPos;
 	private TextView tempRange;
@@ -63,7 +64,8 @@ public class WeatherActivity extends Activity implements OnClickListener{
 		lastCity = pref.getString("last_city", "");	
 		
 		if(TextUtils.isEmpty(lastCity)){
-			//没有lastCity，直接去搜索
+			//没有lastCity，直接去搜索页面
+			Toast.makeText(WeatherActivity.this, "没有城市信息可供显示，去选择一个吧~", Toast.LENGTH_SHORT).show();
 			Intent intent = new Intent(this,SearchCityActivity.class);
 			startActivity(intent);
 			finish();			
@@ -75,7 +77,7 @@ public class WeatherActivity extends Activity implements OnClickListener{
 		updateTime = (TextView)findViewById(R.id.update_time);
 		pm25Value = (TextView)findViewById(R.id.pm25_value);
 		nowTemp = (TextView)findViewById(R.id.now_temp);
-		sunTime = (TextView)findViewById(R.id.sun_time);
+		nowCond = (TextView)findViewById(R.id.now_cond);
 		humiValue = (TextView)findViewById(R.id.humidity);
 		//forecastDate = (TextView)findViewById(R.id.forecast_date);
 		rainyPos = (TextView)findViewById(R.id.rainy_pos);
@@ -92,26 +94,9 @@ public class WeatherActivity extends Activity implements OnClickListener{
 		switchCity.setOnClickListener(this);
 		settingButton.setOnClickListener(this);
 		
-		//cityName = getIntent().getStringExtra("city_name");
-
-		//background.setBackgroundColor();
-		//showDialog();
-
-		/*
-		if(!TextUtils.isEmpty(cityName)){
-		//如果从choose界面中传来了一个county_code，说明此时选择了一个新的城市，必须强制用户从网上下载新的数据以供显示
-			//showMyDialog();
-			
-			createDownloadAddress(cityName);
-			Toast.makeText(WeatherActivity.this, cityName, Toast.LENGTH_SHORT).show();
-			//downloadWeatherInfo(countyCode);
-		}
-		else{
-			//显示历史信息即可。
-			showWeather();
-		}*/
-
-
+		Intent intent = new Intent(this, AutoUpdateService.class);
+		startService(intent);
+		
 		showWeather();	
 	}
 	@Override
@@ -123,14 +108,7 @@ public class WeatherActivity extends Activity implements OnClickListener{
 		showWeather();	
 	} 
 
-/*	
-	private void queryWeatherCode(String countyCode) {
-		// TODO Auto-generated method stub
-		String address = new StringBuilder().append("http://www.weather.com.cn/data/list3/city")
-				.append(countyCode).append(".xml").toString();
-		searchInternetForInfo(address, "countyCode");
-	}
-*/
+
 	private void searchInternetForInfo(String address) {
 		// TODO Auto-generated method stub
 				
@@ -198,8 +176,8 @@ public class WeatherActivity extends Activity implements OnClickListener{
 			updateInfo.setText(cursor.getString(cursor.getColumnIndex("city_name")));
 			suggestion.setText(cursor.getString(cursor.getColumnIndex("suggestion")));
 			
-			String update = new StringBuilder().append("发布时间： ").append(cursor.getString(cursor.getColumnIndex("forecast_date")))
-					.append("， ").append(cursor.getString(cursor.getColumnIndex("update_time"))).toString();				
+			String update = new StringBuilder().append("发布时间： ")
+					.append(cursor.getString(cursor.getColumnIndex("update_time")).replace(' ', '，')).toString();				
 			updateTime.setText(update);
 			
 			pm25Value.setText(cursor.getString(cursor.getColumnIndex("pm25_value")));
@@ -208,14 +186,12 @@ public class WeatherActivity extends Activity implements OnClickListener{
 			
 			humiValue.setText(cursor.getString(cursor.getColumnIndex("humi_value"))+"%");
 			
-			String sunCond = new StringBuilder().append("日出时间：").append(cursor.getString(cursor.getColumnIndex("sunrise_time")))
-					.append("，日落时间：").append(cursor.getString(cursor.getColumnIndex("sunset_time"))).toString();				
-			sunTime.setText(sunCond);
+			String sunCond = new StringBuilder().append(cursor.getString(cursor.getColumnIndex("now_cond"))).toString();				
+			nowCond.setText(sunCond);
 			//forecastDate.setText(pref.getString("forecast_date", ""));
 			rainyPos.setText(cursor.getString(cursor.getColumnIndex("rainy_pos"))+"%");
 			
-			String range = new StringBuilder().append(cursor.getString(cursor.getColumnIndex("now_cond"))).append("  ")
-					.append(cursor.getString(cursor.getColumnIndex("max_temp"))).append("°C ~ ")
+			String range = new StringBuilder().append(cursor.getString(cursor.getColumnIndex("max_temp"))).append("°C ~ ")
 					.append(cursor.getString(cursor.getColumnIndex("min_temp"))).append("°C").toString();				
 			tempRange.setText(range);
 			
@@ -241,21 +217,7 @@ public class WeatherActivity extends Activity implements OnClickListener{
 		
 		searchInternetForInfo(address);
 	}
-/*
-	private void showMyDialog(){
-		if(progressDialog == null){
-			progressDialog = new ProgressDialog(this);
-			progressDialog.setMessage("正在加载天气数据...");
-			progressDialog.setCanceledOnTouchOutside(false);
-		}
-		progressDialog.show();
-	}
-	private void closeMyDialog(){
-		if(progressDialog != null){
-			progressDialog.dismiss();
-		}
-	}	
-	*/
+
 	@Override
 	public void onClick(View v) {
 		// TODO Auto-generated method stub

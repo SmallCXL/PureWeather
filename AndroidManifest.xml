@@ -42,7 +42,11 @@
             android:windowSoftInputMode="adjustPan|stateHidden"
             android:launchMode="singleTask">
              
-        </activity>        
+        </activity>      
+        <service android:name="com.pureweather.app.service.AutoUpdateService">
+        </service>
+        <receiver android:name="com.pureweather.app.receiver.AutoUpdateReceiver">
+        </receiver>      
     </application>
 
 </manifest>
