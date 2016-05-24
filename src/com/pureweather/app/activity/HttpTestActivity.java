@@ -32,7 +32,7 @@ public class HttpTestActivity extends Activity {
 		sendButton = (Button) findViewById(R.id.send);
 		//final String httpUrl = "https://api.heweather.com/x3/citylist?search=allchina&key=37fa5d4ad1ea4d5da9f37e75732fb2e7";
 		
-		final String httpUrl = "http://apis.baidu.com/heweather/pro/weather?city=玉林";
+		final String httpUrl = "https://api.heweather.com/x3/weather?city=发噶如果&key=37fa5d4ad1ea4d5da9f37e75732fb2e7 ";
 		sendButton.setOnClickListener(new OnClickListener(){
 		
 		

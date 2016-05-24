@@ -189,8 +189,10 @@ public class ChooseAreaActivity extends Activity implements OnClickListener{
 			address = new StringBuilder().append("http://www.weather.com.cn/data/list3/city.xml").toString();
 		}
 		else{
-			address = new StringBuilder().append("http://apis.baidu.com/heweather/pro/weather?city=")
-					.append(code).toString();
+			//address = new StringBuilder().append("http://apis.baidu.com/heweather/pro/weather?city=")
+			//		.append(code).toString();
+			address = new StringBuilder().append("https://api.heweather.com/x3/weather?city=")
+					.append(code).append("&key=37fa5d4ad1ea4d5da9f37e75732fb2e7").toString();
 		}
 		
 		showProgressDialog();

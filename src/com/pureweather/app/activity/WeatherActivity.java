@@ -232,10 +232,12 @@ public class WeatherActivity extends Activity implements OnClickListener{
 
 	}
 
-	private void createDownloadAddress(String weatherCode) {
+	private void createDownloadAddress(String cityName) {
 		// TODO Auto-generated method stub
-		String address = new StringBuilder()
-			.append("http://apis.baidu.com/heweather/pro/weather?city=").append(weatherCode).toString();	
+		String address = new StringBuilder().append("https://api.heweather.com/x3/weather?city=")
+				.append(cityName).append("&key=37fa5d4ad1ea4d5da9f37e75732fb2e7").toString();
+		//String address = new StringBuilder()
+		//	.append("http://apis.baidu.com/heweather/pro/weather?city=").append(cityName).toString();	
 		
 		searchInternetForInfo(address);
 	}

@@ -11,6 +11,7 @@ import com.pureweather.app.utils.HttpUtils;
 import com.pureweather.app.utils.ResponseHandleUtils;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -42,7 +43,7 @@ public class SearchCityActivity extends Activity implements OnClickListener{
 	private PureWeatherDB pureWeatherDB;
 	private static final String SEARCH_FAIL = "找不到该城市，请重新搜索...";
 	private String lastCity;
-	
+	private ProgressDialog progressDialog;
 	private String httpResponse;
 	
 	@Override
@@ -88,7 +89,7 @@ public class SearchCityActivity extends Activity implements OnClickListener{
 					editor.commit();
 					
 					Intent intent = new Intent(SearchCityActivity.this,WeatherActivity.class);
-					startActivity(intent);
+					startActivity(intent);					
 					finish();					
 				}
 			}
@@ -107,11 +108,11 @@ public class SearchCityActivity extends Activity implements OnClickListener{
 
 	} 	
 	
-	
 	public void searchForCity(String cityName){
-		String address = new StringBuilder().append("http://apis.baidu.com/heweather/pro/weather?city=")
-				.append(cityName).toString();
-
+		//String address = new StringBuilder().append("http://apis.baidu.com/heweather/pro/weather?city=")
+		//		.append(cityName).toString();
+		String address = new StringBuilder().append("https://api.heweather.com/x3/weather?city=")
+						.append(cityName).append("&key=37fa5d4ad1ea4d5da9f37e75732fb2e7").toString();
 		HttpUtils.sendHttpRequest(address, new HttpCallbackListener(){
 
 			@Override
@@ -121,25 +122,35 @@ public class SearchCityActivity extends Activity implements OnClickListener{
 					//返回结果不为空，处理结果信息
 					if(ResponseHandleUtils.handleWeatherResponse(SearchCityActivity.this, response)){
 						//查找的城市名称确实存在，则更新ListView
-						httpResponse = response;
+						httpResponse = response;//保存返回数据 ，等待存储
+						
 						runOnUiThread(new Runnable(){
 							@Override
 							public void run() {
 								// TODO Auto-generated method stub
 								SharedPreferences pref = PreferenceManager.
 										getDefaultSharedPreferences(SearchCityActivity.this);
-								//Toast.makeText(SearchCityActivity.this, pref.getString("city_name", ""), Toast.LENGTH_SHORT).show();
+								
 									dataList.clear();
 									dataList.add(pref.getString("city_name", ""));
-									adapter.notifyDataSetChanged();								
+									adapter.notifyDataSetChanged();		
+									
 							}
 						});						
 					}
 					else{
-						//查询的结果不合法
-						dataList.clear();
-						dataList.add(SEARCH_FAIL);
-						adapter.notifyDataSetChanged();								
+						runOnUiThread(new Runnable(){
+							@Override
+							public void run() {
+								// TODO Auto-generated method stub
+								//查询的结果不合法
+								dataList.clear();
+								dataList.add(SEARCH_FAIL);
+								adapter.notifyDataSetChanged();		
+								
+							}
+						});
+							
 					}
 				}
 			}
@@ -169,13 +180,15 @@ public class SearchCityActivity extends Activity implements OnClickListener{
 			if(!TextUtils.isEmpty(input)){
 				searchForCity(input);
 				inputName.setText("");
+				
+				//Toast.makeText(SearchCityActivity.this, "请稍等...", Toast.LENGTH_SHORT).show();
 			}
 			
 			break;
 		case (R.id.search_from_list):
 			Intent intent = new Intent(SearchCityActivity.this,ChooseAreaActivity.class);
 			startActivity(intent);
-			//finish();
+			
 			break;
 		
 		case (R.id.search_activity_back):
